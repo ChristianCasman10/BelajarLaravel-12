@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Pegawai;
+use Illuminate\Http\Request;
 
 class PegawaiController extends Controller
 {
@@ -21,7 +21,7 @@ class PegawaiController extends Controller
      */
     public function create()
     {
-        //
+        return view ('pegawai.create');
     }
 
     /**
@@ -29,16 +29,16 @@ class PegawaiController extends Controller
      */
     public function store(Request $request)
     {
-       $validated = $request->validate([
-    'nama' => 'required|max:255',
-    'nip' => 'required|size:5|unique:pegawais,nip',
-    'email' => 'required|email|max:255|unique:pegawais,email',
-    'bidang' => 'required|max:255'
-]);
+        $validated = $request->validate([
+            'nama' => 'required|max:255',
+            'nip' => 'required|size:5|unique:pegawais,nip',
+            'email' => 'required|email|max:255|unique:pegawais,email',
+            'bidang' => 'required|max:255'
+        ]);
 
-Pegawai::create($validated);
+        Pegawai::create($validated);
 
-return redirect('/pegawai')->with('success', 'Data pegawai berhasil ditambahkan!');
+        return redirect('/pegawai')->with('success', 'Data pegawai berhasil ditambahkan!');
     }
 
     /**
@@ -54,7 +54,8 @@ return redirect('/pegawai')->with('success', 'Data pegawai berhasil ditambahkan!
      */
     public function edit(string $id)
     {
-        //
+        $pegawai = Pegawai::findOrFail($id);
+        return view('pegawai.edit', compact('pegawai'));
     }
 
     /**
@@ -62,7 +63,18 @@ return redirect('/pegawai')->with('success', 'Data pegawai berhasil ditambahkan!
      */
     public function update(Request $request, string $id)
     {
-        //
+        $pegawai = Pegawai::findOrFail($id);
+        
+        $validated = $request->validate([
+            'nama' => 'required|max:255',
+            'nip' => 'required|size:5|unique:pegawais,nip,' . $id,
+            'email' => 'required|email|max:255|unique:pegawais,email,' . $id,
+            'bidang' => 'required|max:255'
+        ]);
+
+        $pegawai->update($validated);
+
+        return redirect('/pegawai')->with('success', 'Data pegawai berhasil diupdate!');
     }
 
     /**
@@ -70,6 +82,9 @@ return redirect('/pegawai')->with('success', 'Data pegawai berhasil ditambahkan!
      */
     public function destroy(string $id)
     {
-        //
+        $pegawai = Pegawai::findOrFail($id);
+        $pegawai->delete();
+
+        return redirect('/pegawai')->with('success', 'Data pegawai berhasil dihapus!');
     }
 }
